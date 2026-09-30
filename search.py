@@ -96,8 +96,38 @@ def breadthFirstSearch(problem: SearchProblem):
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+    
+    # priority queue for ucs
+    fringe = PriorityQueue()
+    
+    # add start state, empty actions list, and initial cost (0)
+    # format: item=(state, actions, cost), priority=cost
+    fringe.push((problem.getStartState(), [], 0), 0)
+    
+    # list to store visited nodes
+    visited = []
+    
+    while not fringe.isEmpty():
+        # get the node with the lowest cost
+        current_state, actions, current_cost = fringe.pop()
+        
+        # check if it's the goal
+        if problem.isGoalState(current_state):
+            return actions
+            
+        # check if visited
+        if current_state not in visited:
+            visited.append(current_state) # mark as visited
+            
+            # get all successors
+            for successor, action, stepCost in problem.getSuccessors(current_state):
+                # calculate new total cost
+                new_cost = current_cost + stepCost
+                # add to priority queue with new cost as priority
+                fringe.push((successor, actions + [action], new_cost), new_cost)
+                
+    return []
 
 def nullHeuristic(state, problem=None):
     """
