@@ -86,14 +86,68 @@ def depthFirstSearch(problem: SearchProblem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Stack
+    
+    # stack for dfs
+    fringe = Stack() 
+    
+    # add start state and empty action list
+    fringe.push((problem.getStartState(), [])) 
+    
+    # list to store visited nodes
+    visited = [] 
+    
+    while not fringe.isEmpty():
+        # get the last added node
+        current_state, actions = fringe.pop() 
+        
+        # check if it's the goal
+        if problem.isGoalState(current_state):
+            return actions
+            
+        # check if visited
+        if current_state not in visited:
+            visited.append(current_state) # mark as visited
+            
+            # get all successors
+            for successor, action, stepCost in problem.getSuccessors(current_state):
+                # add to stack with new action
+                fringe.push((successor, actions + [action]))
+                
+    return []
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    from util import Queue
+    
+    # queue for bfs (First-In-First-Out)
+    fringe = Queue() 
+    
+    # add start state and empty action list
+    fringe.push((problem.getStartState(), [])) 
+    
+    # list to store visited nodes
+    visited = [] 
+    
+    while not fringe.isEmpty():
+        # get the oldest added node (FIFO)
+        current_state, actions = fringe.pop() 
+        
+        # check if it's the goal
+        if problem.isGoalState(current_state):
+            return actions
+            
+        # check if visited
+        if current_state not in visited:
+            visited.append(current_state) # mark as visited
+            
+            # get all successors
+            for successor, action, stepCost in problem.getSuccessors(current_state):
+                # add to queue with new action
+                fringe.push((successor, actions + [action]))
+                
+    return []
+    
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
