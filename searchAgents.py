@@ -376,8 +376,35 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
  
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    position, visited = state
+ 
+    # corners that Pacman still has to visit
+    remaining = [corner for corner, wasVisited in zip(corners, visited) if not wasVisited]
+ 
+    # goal state: nothing left to visit
+    if not remaining:
+        return 0
+ 
+    # Try every possible order of visiting the remaining corners (max 4! = 24 orders).
+    # For each order, add up the Manhattan distances (walls ignored) and keep the smallest.
+    # Manhattan distance never overestimates the real maze distance, so this is a lower
+    # bound on the real cost -> admissible. It is also consistent.
+    from itertools import permutations
+ 
+    def manhattan(a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+ 
+    best = None
+    for order in permutations(remaining):
+        total = 0
+        current = position
+        for corner in order:
+            total += manhattan(current, corner)
+            current = corner
+        if best is None or total < best:
+            best = total
+ 
+    return best
  
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -558,8 +585,3 @@ def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pa
     prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
     return len(search.bfs(prob))
  
-
-
-
-
-
