@@ -497,8 +497,37 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
+    """
+    Your heuristic for the FoodSearchProblem goes here.
+    """
+    position, foodGrid = state
+    food_list = foodGrid.asList()
+    
+    # if no food is left, cost is 0
+    if not food_list:
+        return 0
+        
+    # use a dictionary to cache distances so it runs faster
+    if 'distances' not in problem.heuristicInfo:
+        problem.heuristicInfo['distances'] = {}
+    dist_cache = problem.heuristicInfo['distances']
+    
+    def get_maze_dist(p1, p2):
+        # calculate maze distance and save it in cache
+        key = tuple(sorted((p1, p2)))
+        if key not in dist_cache:
+            dist_cache[key] = mazeDistance(p1, p2, problem.startingGameState)
+        return dist_cache[key]
+        
+    # find the distance to the farthest food dot
+    max_dist = 0
+    for food in food_list:
+        dist = get_maze_dist(position, food)
+        if dist > max_dist:
+            max_dist = dist
+            
+    return max_dist
  
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
