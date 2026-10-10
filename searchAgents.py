@@ -471,34 +471,34 @@ class AStarFoodSearchAgent(SearchAgent):
 def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     Your heuristic for the FoodSearchProblem goes here.
- 
-    This heuristic must be consistent to ensure correctness.  First, try to come
-    up with an admissible heuristic; almost all admissible heuristics will be
-    consistent as well.
- 
-    If using A* ever finds a solution that is worse uniform cost search finds,
-    your heuristic is *not* consistent, and probably not admissible!  On the
-    other hand, inadmissible or inconsistent heuristics may find optimal
-    solutions, so be careful.
- 
-    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
-    (see game.py) of either True or False. You can call foodGrid.asList() to get
-    a list of food coordinates instead.
- 
-    If you want access to info like walls, capsules, etc., you can query the
-    problem.  For example, problem.walls gives you a Grid of where the walls
-    are.
- 
-    If you want to *store* information to be reused in other calls to the
-    heuristic, there is a dictionary called problem.heuristicInfo that you can
-    use. For example, if you only want to count the walls once and store that
-    value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
-    Subsequent calls to this heuristic can access
-    problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    food_list = foodGrid.asList()
+    
+    # if no food is left, cost is 0
+    if not food_list:
+        return 0
+        
+    # use a dictionary to cache distances so it runs faster
+    if 'distances' not in problem.heuristicInfo:
+        problem.heuristicInfo['distances'] = {}
+    dist_cache = problem.heuristicInfo['distances']
+    
+    def get_maze_dist(p1, p2):
+        # calculate maze distance and save it in cache
+        key = tuple(sorted((p1, p2)))
+        if key not in dist_cache:
+            dist_cache[key] = mazeDistance(p1, p2, problem.startingGameState)
+        return dist_cache[key]
+        
+    # find the distance to the farthest food dot
+    max_dist = 0
+    for food in food_list:
+        dist = get_maze_dist(position, food)
+        if dist > max_dist:
+            max_dist = dist
+            
+    return max_dist
  
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
